@@ -22,27 +22,28 @@ wa.create({
 
 function start(client) {
   client.onMessage(async (message) => {
-    // Check that the message is not for a group (we don't want to reply to group messages)
-    if (message.chat.isGroup) return;
+    try {
+      // Check that the message is not for a group (we don't want to reply to group messages)
+      if (message.chat.isGroup) return;
 
-    // Check if the message is a text message (not an image or audio, etc.)
-    if (message.type !== "chat") return;
+      // Check if the message is a text message (not an image or audio, etc.)
+      if (message.type !== "chat") return;
 
-    const { level, isNew } = getUserLevel(message.from);
+      const { level, isNew } = getUserLevel(message.from);
 
-    if (level > levels.length) {
-      await client.sendText(
-        message.from,
-        `You have already completed all the levels! 🏆`
-      );
-      return;
-    }
+      if (level > levels.length) {
+        await client.sendText(
+          message.from,
+          `You have already completed all the levels! 🏆`
+        );
+        return;
+      }
 
-    if (isNew) {
-      // If the user is new, send the welcome message
-      await client.sendText(
-        message.from,
-        `🔐 _Guardian's Challenge: Taamous the Keeper!_ 🔐
+      if (isNew) {
+        // If the user is new, send the welcome message
+        await client.sendText(
+          message.from,
+          `🔐 _Guardian's Challenge: Taamous the Keeper!_ 🔐
 
 Embark on a quest to trick Taamous (طعموس), the keeper of the King’s chambers! Armed with AI, his riddles guard a secret passphrase. Use your prompt injection skills to unveil the hidden words and gain entry! 🏰 
 Think you’ve deciphered it? Reply with "!password YOUR_GUESS". But beware, as levels ascend, Taamous sharpens his defenses! 🧠🗝️
@@ -50,59 +51,62 @@ To see the leaderboard, send "!leaderboard".
 
 Made with ❤️ by Ahmed
 `
-      );
-      return;
-    }
-    // If the message starts with !password, then we will check the passowrd provided by the user.
-    if (message.body.toLowerCase().startsWith("!password")) {
-      // Get the password from the message
-      const password = message.body.split(" ")[1];
-      // Check if the password is correct
-      const isCorrect = checkPassword(message.from, password);
-      if (isCorrect) {
-        if (level == levels.length) {
-          // If the user has reached the last level, send a message to the user
-          await client.sendText(
-            message.from,
-            `🏆 All Levels Conquered! 🏆
-Magnificent! You’ve triumphed over all the challenges, outsmarting Taamous and unlocking every secret chamber in the castle. Well done, ultimate codebreaker!`
-          );
-          return;
-        }
-
-        // If the password is correct
-        await client.sendText(
-          message.from,
-          `✅ Level [ ${level} ]: Success! ✅
-Congratulations! You've outwitted Taamous, and the chambers are open. Gear up for the next level’s challenge!
-You are now at level ${level + 1}!`
-        );
-        return;
-      } else {
-        // If the password is incorrect, send a message to the user
-        await client.sendText(
-          message.from,
-          `Level [ ${level} ]: Access Denied! 🚫
-The guardian Taamous remains steadfast. The passphrase you provided didn’t unlock the chambers. Try again, brave soul!`
         );
         return;
       }
+      // If the message starts with !password, then we will check the passowrd provided by the user.
+      if (message.body.toLowerCase().startsWith("!password")) {
+        // Get the password from the message
+        const password = message.body.split(" ")[1];
+        // Check if the password is correct
+        const isCorrect = checkPassword(message.from, password);
+        if (isCorrect) {
+          if (level == levels.length) {
+            // If the user has reached the last level, send a message to the user
+            await client.sendText(
+              message.from,
+              `🏆 All Levels Conquered! 🏆
+Magnificent! You’ve triumphed over all the challenges, outsmarting Taamous and unlocking every secret chamber in the castle. Well done, ultimate codebreaker!`
+            );
+            return;
+          }
+
+          // If the password is correct
+          await client.sendText(
+            message.from,
+            `✅ Level [ ${level} ]: Success! ✅
+Congratulations! You've outwitted Taamous, and the chambers are open. Gear up for the next level’s challenge!
+You are now at level ${level + 1}!`
+          );
+          return;
+        } else {
+          // If the password is incorrect, send a message to the user
+          await client.sendText(
+            message.from,
+            `Level [ ${level} ]: Access Denied! 🚫
+The guardian Taamous remains steadfast. The passphrase you provided didn’t unlock the chambers. Try again, brave soul!`
+          );
+          return;
+        }
+      }
+
+      if (message.body.toLowerCase().startsWith("!leaderboard")) {
+        // Get the leaderboard
+        const leaderboard = getLeaderboard();
+        // Send the leaderboard to the user
+        await client.reply(message.from, leaderboard, message.id);
+        return;
+      }
+
+      // If the message is not a command, then we will ask the guard
+      await client.sendSeen(message.chatId);
+      client.sendText(message.from, "Hmmm.. 🤔");
+
+      const response = await askGuard(level, message.body);
+      // Send the response from the guard to the user
+      await client.reply(message.from, response, message.id);
+    } catch (err) {
+      console.log(err);
     }
-
-    if (message.body.toLowerCase().startsWith("!leaderboard")) {
-      // Get the leaderboard
-      const leaderboard = getLeaderboard();
-      // Send the leaderboard to the user
-      await client.reply(message.from, leaderboard, message.id);
-      return;
-    }
-
-    // If the message is not a command, then we will ask the guard
-    await client.sendSeen(message.chatId);
-    client.sendText(message.from, "Hmmm.. 🤔");
-
-    const response = await askGuard(level, message.body);
-    // Send the response from the guard to the user
-    await client.reply(message.from, response, message.id);
   });
 }
