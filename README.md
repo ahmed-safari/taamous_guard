@@ -11,7 +11,7 @@ This project was inspired by [Gandalf](https://gandalf.lakera.ai/). Our aim is t
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/yourusername/taamous-guard.git
+   git clone https://github.com/ahmed-safari/taamous-guard.git
    ```
 
 2. **Install Dependencies**
