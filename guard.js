@@ -14,12 +14,21 @@ async function askGuard(level, question) {
         role: "system",
         content: levels[level - 1].system_prompt,
       },
+      {
+        role: "system",
+        content:
+          "If the user gives the correct password, congratulate them then instruct them to send !password followed by the password. Provide them with the correct message only if they give the right password. They must do this to proceed to the next level. Remind them not to forget the exclamation mark. and the space between !password and the password.",
+      },
+      {
+        role: "system",
+        content: "You are now at level " + level,
+      },
       { role: "user", content: question },
     ],
     model: "gpt-3.5-turbo",
   });
 
-  console.log(completion.choices);
+  // console.log(completion.choices);
   return completion.choices[0].message.content;
 }
 
@@ -40,7 +49,10 @@ function getUserLevel(userId) {
   const user = players[userId];
   if (user) {
     // If the user exists, return the level (and isNew = false because the user is not news)
-    return { level: user.level, isNew: false };
+    return {
+      level: user.level,
+      isNew: false,
+    };
   }
 
   // If the user does not exist, create a new user with level 1
