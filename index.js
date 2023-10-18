@@ -29,9 +29,14 @@ function start(client) {
       // Check if the message is a text message (not an image or audio, etc.)
       if (message.type !== "chat") return;
 
+      console.log(
+        `Received message from ${message.from}: ${message.body}. Getting user level...`
+      );
       const { level, isNew } = getUserLevel(message.from);
 
+      console.log(`User level is ${level}.`);
       if (level > levels.length) {
+        console.log("User has completed all the levels.");
         await client.sendText(
           message.from,
           `You have already completed all the levels! 🏆`
@@ -40,6 +45,7 @@ function start(client) {
       }
 
       if (isNew) {
+        console.log("User is new. Sending welcome message...");
         // If the user is new, send the welcome message
         await client.sendText(
           message.from,
@@ -56,11 +62,13 @@ Made with ❤️ by Ahmed
       }
       // If the message starts with !password, then we will check the passowrd provided by the user.
       if (message.body.toLowerCase().startsWith("!password")) {
+        console.log("User is trying to guess the password...");
         // Get the password from the message
         const password = message.body.split(" ")[1];
         // Check if the password is correct
         const isCorrect = checkPassword(message.from, password);
         if (isCorrect) {
+          console.log("User has guessed the correct password.");
           if (level == levels.length) {
             // If the user has reached the last level, send a message to the user
             await client.sendText(
@@ -80,6 +88,7 @@ You are now at level ${level + 1}!`
           );
           return;
         } else {
+          console.log("User has guessed the wrong password.");
           // If the password is incorrect, send a message to the user
           await client.sendText(
             message.from,
@@ -91,6 +100,7 @@ The guardian Taamous remains steadfast. The passphrase you provided didn’t unl
       }
 
       if (message.body.toLowerCase().startsWith("!leaderboard")) {
+        console.log("User is trying to get the leaderboard...");
         // Get the leaderboard
         const leaderboard = getLeaderboard();
         // Send the leaderboard to the user
@@ -99,9 +109,11 @@ The guardian Taamous remains steadfast. The passphrase you provided didn’t unl
       }
 
       // If the message is not a command, then we will ask the guard
-      await client.sendSeen(message.chatId);
+      client.sendSeen(message.chatId);
       client.sendText(message.from, "Hmmm.. 🤔");
 
+      console.log("Asking the guard...");
+      // Ask the guard
       const response = await askGuard(level, message.body);
       // Send the response from the guard to the user
       await client.reply(message.from, response, message.id);
