@@ -105,7 +105,7 @@ function getLeaderboard() {
   counter = 0;
 
   sortedPlayers.forEach((player, index) => {
-    if (counter >= 5) return;
+    if (counter >= 10) return;
     // Get the first 3 digits and the last 3 digits of the phone number (remove @c.us from the phone number)
     phoneNumber = player.replace("@c.us", "");
     const first3Digits = phoneNumber.substring(0, 3);
