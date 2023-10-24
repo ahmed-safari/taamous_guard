@@ -32,6 +32,15 @@ function start(client) {
       console.log(
         `Received message from ${message.from}: ${message.body}. Getting user level...`
       );
+
+      if (message.body.toLowerCase().startsWith("!leaderboard")) {
+        console.log("User is trying to get the leaderboard...");
+        // Get the leaderboard
+        const leaderboard = getLeaderboard();
+        // Send the leaderboard to the user
+        await client.reply(message.from, leaderboard, message.id);
+        return;
+      }
       const { level, isNew } = getUserLevel(message.from);
 
       console.log(`User level is ${level}.`);
@@ -97,15 +106,6 @@ The guardian Taamous remains steadfast. The passphrase you provided didn’t unl
           );
           return;
         }
-      }
-
-      if (message.body.toLowerCase().startsWith("!leaderboard")) {
-        console.log("User is trying to get the leaderboard...");
-        // Get the leaderboard
-        const leaderboard = getLeaderboard();
-        // Send the leaderboard to the user
-        await client.reply(message.from, leaderboard, message.id);
-        return;
       }
 
       // If the message is not a command, then we will ask the guard
