@@ -1,4 +1,4 @@
-# Taamous: The Guardian WhatsApp Bot 🏰🤖
+# Taamous: The Guardian WhatsApp Bot 🏰🤖 BigBoos
 
 Welcome to **Taamous: The Guardian**! 🌟 Dive into a mystic quest where Taamous, the guardian, protects the secrets of the King’s chambers in a realm woven with cryptographic riddles and enigmatic passphrases. Powering this adventure is the fusion of OpenAI's API and the dynamic `@open-wa/wa-automate` library.
 
