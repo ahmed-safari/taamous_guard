@@ -63,8 +63,9 @@ function parseFastIntent(text) {
   if (lower.startsWith("!password")) {
     return { cmd: "password", arg: firstWord(trimmed.slice("!password".length)) };
   }
+  if (lower.startsWith("!fullboard")) return { cmd: "fullboard" };
   if (lower.startsWith("!leaderboard")) return { cmd: "leaderboard" };
-  if (lower.startsWith("!help")) return { cmd: "help" };
+  if (lower.startsWith("!reset")) return { cmd: "reset" };
   if (lower.startsWith("!name")) {
     return { cmd: "name", arg: trimmed.slice("!name".length).trim() };
   }

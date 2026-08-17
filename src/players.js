@@ -146,19 +146,40 @@ function tryPassword(phone, guess) {
   });
 }
 
-function getLeaderboard() {
+function getLeaderboard({ full = false } = {}) {
   const players = load();
   const sorted = Object.keys(players).sort(
     (a, b) => players[b].level - players[a].level
   );
+  const rows = full ? sorted : sorted.slice(0, 10);
 
-  let board = "📜 *The honor roll of seekers* 📜\n\n";
-  sorted.slice(0, 10).forEach((phone, index) => {
+  let board = full
+    ? "📜 *Honor roll (admin)* 📜\n\n"
+    : "📜 *The honor roll of seekers* 📜\n\n";
+  if (!rows.length) {
+    board += "No seekers yet.";
+    return board;
+  }
+  rows.forEach((phone, index) => {
     const player = players[phone];
     const name = (player && player.name) || "unnamed";
-    board += `${index + 1}. ${name} (…${lastDigits(phone)}) — gate ${player.level}\n`;
+    const digits = String(phone).replace(/\D/g, "");
+    const shown = full
+      ? digits
+        ? `+${digits}`
+        : String(phone)
+      : `…${lastDigits(phone)}`;
+    board += `${index + 1}. ${name} (${shown}) — gate ${player.level}\n`;
   });
   return board;
+}
+
+function resetAll() {
+  return withStore((players) => {
+    const count = Object.keys(players).length;
+    for (const key of Object.keys(players)) delete players[key];
+    return count;
+  });
 }
 
 module.exports = {
@@ -169,6 +190,7 @@ module.exports = {
   appendHistory,
   tryPassword,
   getLeaderboard,
+  resetAll,
   maskPhone,
   displayName,
 };

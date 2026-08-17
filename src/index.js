@@ -23,8 +23,10 @@ const pendingByPhone = new Map();
 const lastReplyAt = new Map();
 const lastWarnedAt = new Map();
 
-function rateSeconds() {
-  return Math.max(1, Math.round(RATE_MS / 1000));
+function isAdminCommand(phone, text) {
+  if (!isAdmin(phone)) return false;
+  const cmd = parseFastIntent(text)?.cmd;
+  return cmd === "reset" || cmd === "fullboard";
 }
 
 async function warnSlowDown(phone, data) {
@@ -138,6 +140,7 @@ async function handleMessage(data, { bypassCooldown } = {}) {
     !needsName &&
     awaiting !== "name" &&
     awaiting !== "password" &&
+    !isAdminCommand(phone, text) &&
     lastReplyAt.has(phone) &&
     Date.now() - lastReplyAt.get(phone) < RATE_MS;
 
@@ -186,6 +189,29 @@ async function processMessage({
   quoted,
 }) {
   await evolution.sendPresence(to);
+
+  const fast = parseFastIntent(text);
+  if (fast?.cmd === "reset" || fast?.cmd === "fullboard") {
+    if (!isAdmin(phone)) {
+      console.log(`ignore !${fast.cmd} from`, phone);
+      return;
+    }
+    if (fast.cmd === "reset") {
+      const count = await players.resetAll();
+      lastReplyAt.clear();
+      lastWarnedAt.clear();
+      pendingByPhone.clear();
+      console.log(`admin reset: removed ${count} players`);
+      await evolution.sendText(
+        to,
+        `Players list cleared. ${count} seeker${count === 1 ? "" : "s"} removed.`,
+        quoted
+      );
+      return;
+    }
+    await evolution.sendText(to, players.getLeaderboard({ full: true }), quoted);
+    return;
+  }
 
   if (needsName) {
     const fast = parseFastIntent(text);
