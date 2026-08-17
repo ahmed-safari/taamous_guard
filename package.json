@@ -14,9 +14,8 @@
   "author": "Ahmed Safari",
   "license": "MIT",
   "dependencies": {
-    "@open-wa/wa-automate": "^4.66.3",
     "dotenv": "^16.3.1",
-    "fs": "^0.0.1-security",
+    "express": "^4.21.2",
     "openai": "^4.12.3"
   }
 }

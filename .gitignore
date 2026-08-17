@@ -3,3 +3,4 @@ node_modules
 _IGNORE_*
 package-lock.json
 *.data.json
+data/*.jsonl
