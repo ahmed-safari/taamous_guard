@@ -23,6 +23,16 @@ const pendingByPhone = new Map();
 const lastReplyAt = new Map();
 const lastWarnedAt = new Map();
 
+function rateSeconds() {
+  return Math.max(1, Math.round(RATE_MS / 1000));
+}
+
+function isAdmin(phone) {
+  const admin = (process.env.ADMIN_PHONE || "").replace(/\D/g, "");
+  const digits = String(phone || "").replace(/\D/g, "");
+  return Boolean(admin && digits && digits === admin);
+}
+
 function isAdminCommand(phone, text) {
   if (!isAdmin(phone)) return false;
   const cmd = parseFastIntent(text)?.cmd;
