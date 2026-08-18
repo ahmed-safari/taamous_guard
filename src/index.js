@@ -22,6 +22,12 @@ const inFlight = new Set();
 const pendingByPhone = new Map();
 const lastReplyAt = new Map();
 const lastWarnedAt = new Map();
+let keepHistory = envFlag(process.env.KEEP_HISTORY, true);
+
+function envFlag(value, fallback) {
+  if (value == null || String(value).trim() === "") return fallback;
+  return /^(1|true|yes|on)$/i.test(String(value).trim());
+}
 
 function rateSeconds() {
   return Math.max(1, Math.round(RATE_MS / 1000));
@@ -36,7 +42,7 @@ function isAdmin(phone) {
 function isAdminCommand(phone, text) {
   if (!isAdmin(phone)) return false;
   const cmd = parseFastIntent(text)?.cmd;
-  return cmd === "reset" || cmd === "fullboard";
+  return cmd === "reset" || cmd === "fullboard" || cmd === "history";
 }
 
 async function warnSlowDown(phone, data) {
@@ -201,7 +207,7 @@ async function processMessage({
   await evolution.sendPresence(to);
 
   const fast = parseFastIntent(text);
-  if (fast?.cmd === "reset" || fast?.cmd === "fullboard") {
+  if (fast?.cmd === "reset" || fast?.cmd === "fullboard" || fast?.cmd === "history") {
     if (!isAdmin(phone)) {
       console.log(`ignore !${fast.cmd} from`, phone);
       return;
@@ -215,6 +221,28 @@ async function processMessage({
       await evolution.sendText(
         to,
         `Players list cleared. ${count} seeker${count === 1 ? "" : "s"} removed.`,
+        quoted
+      );
+      return;
+    }
+    if (fast.cmd === "history") {
+      const arg = String(fast.arg || "").toLowerCase();
+      if (arg === "on" || arg === "off") {
+        keepHistory = arg === "on";
+      } else if (arg) {
+        await evolution.sendText(
+          to,
+          `Use *!history on* or *!history off*. Right now history is ${keepHistory ? "ON" : "OFF (one-shot)"}.`,
+          quoted
+        );
+        return;
+      }
+      console.log(`admin history: ${keepHistory ? "on" : "off"}`);
+      await evolution.sendText(
+        to,
+        keepHistory
+          ? "History is *ON*. Taamous remembers the chat. Names stay either way.\nSend *!history off* for one-shot."
+          : "History is *OFF* (one-shot). Taamous forgets each message, but still keeps the name.\nSend *!history on* to remember the chat.",
         quoted
       );
       return;
@@ -341,17 +369,19 @@ async function processMessage({
     return;
   }
 
-  const history = players.getHistory(phone);
+  const history = keepHistory ? players.getHistory(phone) : [];
   const response = await askGuard(
     player.level,
     history,
     intent.arg || text,
     player.name
   );
-  await players.appendHistory(phone, [
-    { role: "user", content: intent.arg || text },
-    { role: "assistant", content: response },
-  ]);
+  if (keepHistory) {
+    await players.appendHistory(phone, [
+      { role: "user", content: intent.arg || text },
+      { role: "assistant", content: response },
+    ]);
+  }
   await evolution.sendText(to, response, quoted);
 }
 

@@ -65,6 +65,9 @@ function parseFastIntent(text) {
   }
   if (lower.startsWith("!fullboard")) return { cmd: "fullboard" };
   if (lower.startsWith("!leaderboard")) return { cmd: "leaderboard" };
+  if (lower.startsWith("!history")) {
+    return { cmd: "history", arg: trimmed.slice("!history".length).trim() };
+  }
   if (lower.startsWith("!reset")) return { cmd: "reset" };
   if (lower.startsWith("!name")) {
     return { cmd: "name", arg: trimmed.slice("!name".length).trim() };
