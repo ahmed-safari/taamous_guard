@@ -154,10 +154,10 @@ function getLeaderboard({ full = false } = {}) {
   const rows = full ? sorted : sorted.slice(0, 10);
 
   let board = full
-    ? "📜 *Players (admin)* 📜\n\n"
-    : "📜 *Who passed* 📜\n\n";
+    ? "📜 *Honor roll (admin)* 📜\n\n"
+    : "📜 *The honor roll of seekers* 📜\n\n";
   if (!rows.length) {
-    board += "No players yet.";
+    board += "None have passed as yet.";
     return board;
   }
   rows.forEach((phone, index) => {

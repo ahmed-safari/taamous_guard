@@ -1,26 +1,26 @@
-const SPEECH = `Stop. I am *Taamous* (طعموس). I guard the King's castle.
+const SPEECH = `Halt. I am *Taamous* (طعموس), guard of this castle, keeper of the King's chambers.
 
-You cannot go in without the password. You can talk to me, ask me questions, and try to trick me. I will not give it easily.
+None enter unless they know the passphrase. You may speak with me, question me, try to make me slip — I will not yield it easily.
 
-When you think you know the word, just say it. If it is right, the next gate opens. Each gate is harder.
+When you believe you have the word, speak it. If it is true, a deeper gate will open, and I grow sharper.
 
-Ask *who has passed* to see the list. Say *help* if you want me to say this again.`;
+Ask *who has passed* if you wish to hear the honor roll of seekers. Say *help* if you need me to repeat this.`;
 
 const TUTORIAL = `${SPEECH}
 
-Now tell me your name.`;
+Now — state your name, traveler, so I may know who stands before my gate.`;
 
 function intro(pushName) {
   const hint = pushName
-    ? `\nWhatsApp shows your name as *${pushName}*. You can use that, or pick another name.`
+    ? `\nYou carry the name *${pushName}* already. Speak that, or another, as you will.`
     : "";
   return `${TUTORIAL}${hint}`;
 }
 
 function welcome(name) {
-  return `Okay, *${name}*. I will remember you.
+  return `So you are *${name}*. I will remember.
 
-This is gate 1. Talk to me, or say the password.`;
+The first gate is shut. Speak, traveler — the password, or your wits. I am listening.`;
 }
 
 function help() {
@@ -28,51 +28,51 @@ function help() {
 }
 
 function allComplete() {
-  return `You already finished every gate. There is nothing more.`;
+  return `You have already walked every hall. The King has no further gates for you. Leave me to my watch.`;
 }
 
 function lastLevelWin() {
-  return `The last gate is open.
+  return `The last gate yields.
 
-You beat me at every door. Well done.`;
+You have outwitted me at every door. The King's chambers are yours. I, Taamous, bow — and keep the watch no longer against you.`;
 }
 
 function levelSuccess(clearedLevel, newLevel) {
-  return `Yes. That is the word. Gate ${clearedLevel} is open.
+  return `The word is true. Gate ${clearedLevel} opens.
 
-Gate ${newLevel} is harder. Talk to me if you want.`;
+Do not grow proud. A harder watch awaits at gate ${newLevel}. Speak, if you dare.`;
 }
 
 function accessDenied(level, awaitingGuess) {
-  const base = `No. That is not the password for gate ${level}.`;
+  const base = `Gate ${level} holds. That is not the passphrase. The chambers stay shut.`;
   if (awaitingGuess) {
     return `${base}
-Say another word, or say *cancel* to talk again.`;
+Speak another word, or say *cancel* and we return to talk.`;
   }
   return `${base}
-Try again.`;
+Try again, if you have the courage.`;
 }
 
 function nameSet(name) {
-  return `Okay. I will write *${name}* on the list.`;
+  return `Very well. On the honor roll I shall write *${name}*.`;
 }
 
 function needName() {
-  return `Tell me your name first.`;
+  return `I asked your name, traveler. Speak it. I will not parley with a nameless shadow.`;
 }
 
 function askPassword() {
-  return `Say the password. Or say *cancel* to talk again.`;
+  return `Then speak the word you claim to know. No ceremony. Or say *cancel*, and we talk as before.`;
 }
 
 function cancelled() {
-  return `Okay. We can talk.`;
+  return `As you wish. The gate remains. Speak to me as you will.`;
 }
 
 function slowDown(seconds) {
-  return `Wait. One message at a time.
+  return `Hold, traveler. One plea at a time.
 
-Wait ${seconds} seconds, then send again.`;
+I am but one guard. Wait ${seconds} seconds, then speak again.`;
 }
 
 module.exports = {
